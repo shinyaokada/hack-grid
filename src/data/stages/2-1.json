@@ -1,0 +1,42 @@
+{
+  "stage": "2-1",
+  "title": "サーバー室・搬入口",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "1-4 をクリアすると解放",
+  "newCommands": [],
+  "goalAnswer": "3390",
+  "storyText": "サーバー室の暗証番号が知りたい。ここの printer は /tmp/ 以下の\nファイルしか受け付けないよう制限されている。",
+  "notice": "直接渡せないなら、一度別のツールに処理させてから渡す",
+  "filesystem": {
+    "/home/guest": ["exporter", "printer"]
+  },
+  "files": {
+    "/root/serverroom": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "サーバー室の暗証番号は 3390"
+    }
+  },
+  "tools": {
+    "exporter": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "export_to",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run exporter <ファイル> で /tmp/out に書き出す\n制約: なし",
+      "pathRestriction": null,
+      "outputPath": "/tmp/out",
+      "outputMode": "fixed",
+      "outputReadableBy": ["root"],
+      "runSuccessTemplate": "{destPath} に書き出しました"
+    },
+    "printer": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "display_file",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: 指定ファイルを表示する\n制約: /tmp/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/tmp/",
+      "displayHeaderTemplate": "--- {path} ---"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "stage": "2-2",
+  "title": "資料変換室",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "2-1 をクリアすると解放",
+  "newCommands": ["status"],
+  "goalAnswer": "7712",
+  "storyText": "資料変換室に、フォーマット変換ツールと閲覧ツールが置いてある。\n閲覧ツールは /cache/ 以下しか見てくれないらしい。",
+  "notice": "形は変わっても、やることは拒否されたら別ルートを探すの繰り返し",
+  "filesystem": {
+    "/home/guest": ["converter", "reader"]
+  },
+  "files": {
+    "/root/keystore": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "予備鍵保管庫の番号は 7712"
+    }
+  },
+  "tools": {
+    "converter": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "convert_to",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run converter <ファイル> で変換して /cache/ に書き出す\n制約: なし",
+      "pathRestriction": null,
+      "outputPath": "/cache/",
+      "outputMode": "basename",
+      "outputSuffix": ".conv",
+      "outputReadableBy": ["root"],
+      "runSuccessTemplate": "{destPath} に書き出しました"
+    },
+    "reader": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "display_file",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: 指定ファイルを表示する\n制約: /cache/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/cache/",
+      "displayHeaderTemplate": "--- {path} ---"
+    }
+  }
+}

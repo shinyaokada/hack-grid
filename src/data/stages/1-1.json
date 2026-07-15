@@ -1,0 +1,25 @@
+{
+  "stage": "1-1",
+  "title": "受付端末",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": null,
+  "newCommands": ["ls", "cd", "read"],
+  "goalAnswer": "7008",
+  "storyText": "サクラ物流センターの受付端末に guest としてログインした。\nまずは自分に何ができるか、手近なところから確認してみよう。",
+  "notice": "拒否されても、まず ls と read だけで進められる場所はある",
+  "filesystem": {
+    "/home/guest": ["memo.txt", "staff/"]
+  },
+  "dirs": {
+    "/home/guest/staff": { "enterableBy": ["staff"] }
+  },
+  "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root", "staff"],
+      "content": "今日の合言葉は 7008\n（本当に大事な金庫の番号は root にしか見られない場所にあるらしい……）"
+    }
+  },
+  "tools": {}
+}

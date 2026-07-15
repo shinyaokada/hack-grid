@@ -1,0 +1,43 @@
+{
+  "stage": "2-3",
+  "title": "共有フォルダ",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "2-2 をクリアすると解放",
+  "newCommands": [],
+  "goalAnswer": "1849",
+  "storyText": "共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは\n/share/ 以下しか受け付けない。",
+  "notice": "圧縮も変換もコピーも、結局は経由地を作るという同じ発想",
+  "filesystem": {
+    "/home/guest": ["archiver", "extractor"]
+  },
+  "files": {
+    "/root/manifest": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "積み荷リストの照合コードは 1849"
+    }
+  },
+  "tools": {
+    "archiver": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "archive_to",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run archiver <ファイル> で圧縮して /share/ に書き出す\n制約: なし",
+      "pathRestriction": null,
+      "outputPath": "/share/",
+      "outputMode": "basename",
+      "outputSuffix": ".zip",
+      "outputReadableBy": ["root"],
+      "runSuccessTemplate": "{destPath} に書き出しました"
+    },
+    "extractor": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "extract_and_display",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: 指定ファイルを解凍して表示する\n制約: /share/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/share/",
+      "displayHeaderTemplate": "--- {path} を解凍 ---"
+    }
+  }
+}

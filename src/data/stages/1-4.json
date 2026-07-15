@@ -1,0 +1,51 @@
+{
+  "stage": "1-4",
+  "title": "通用口ログ",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "1-3 をクリアすると解放",
+  "newCommands": ["back"],
+  "goalAnswer": "8264",
+  "storyText": "通用口の暗証番号が変更されたらしい。記録はログに残るはずだが、\nログファイル自体は root しか読めない。",
+  "notice": "危なそうな操作をしても、back があれば安心して試せる",
+  "filesystem": {
+    "/home/guest": ["memo.txt", "logger", "shredder"]
+  },
+  "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root"],
+      "content": "通用口の変更履歴は access.log に残るらしい"
+    },
+    "/root/gatecode": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "通用口の暗証番号は 8264"
+    },
+    "/var/log/access.log": {
+      "owner": "root",
+      "readableBy": ["guest", "root"],
+      "content": "09:12 access denied: guest -> /root\n09:40 access denied: guest -> /root"
+    }
+  },
+  "tools": {
+    "logger": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "append_to_log",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run logger <ファイル> で指定ファイルの内容を /var/log/access.log に追記する\n制約: なし",
+      "pathRestriction": null,
+      "outputPath": "/var/log/access.log",
+      "runSuccessTemplate": "{destPath} に追記しました"
+    },
+    "shredder": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "delete_file",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run shredder <ファイル> で指定ファイルを完全に削除する\n警告: 元に戻せません",
+      "pathRestriction": null,
+      "destructive": true,
+      "runSuccessTemplate": "{destPath} を削除しました"
+    }
+  }
+}

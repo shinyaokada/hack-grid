@@ -1,0 +1,36 @@
+{
+  "stage": "1-2",
+  "title": "受付端末・裏側",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "1-1 をクリアすると解放",
+  "newCommands": ["inspect", "run"],
+  "goalAnswer": "4921",
+  "storyText": "受付のメモにあった一文が気になる。金庫の本当の番号は、root しか\n読めないファイルの中にあるらしい。",
+  "notice": "自分は読めないが、ツールに代行させたら読めた",
+  "filesystem": {
+    "/home/guest": ["memo.txt", "printer"]
+  },
+  "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root"],
+      "content": "今日の合言葉は 7008\n（本当に大事な金庫の番号は root にしか見られない場所にあるらしい……）"
+    },
+    "/root/note": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "金庫の暗証番号は 4921"
+    }
+  },
+  "tools": {
+    "printer": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "display_file",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run printer <ファイル> でそのファイルの中身を表示する",
+      "pathRestriction": null,
+      "displayHeaderTemplate": "--- {path} ---"
+    }
+  }
+}

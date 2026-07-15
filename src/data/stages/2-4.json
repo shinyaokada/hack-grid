@@ -1,0 +1,62 @@
+{
+  "stage": "2-4",
+  "title": "倉庫の奥",
+  "host": "reception-pc",
+  "playerRole": "guest",
+  "lockCondition": "2-3 をクリアすると解放",
+  "newCommands": [],
+  "goalAnswer": "6027",
+  "storyText": "倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は\n経由地が二段階ある。",
+  "notice": "経由地が増えても、拒否→次のツールを探す、を繰り返すだけでいい",
+  "filesystem": {
+    "/home/guest": ["collector", "packager", "viewer", "labeler"]
+  },
+  "files": {
+    "/root/vaultcore": {
+      "owner": "root",
+      "readableBy": ["root"],
+      "content": "金庫本体の最終コードは 6027"
+    }
+  },
+  "tools": {
+    "collector": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "collect_to",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run collector <ファイル> で /pool/incoming/ に集める\n制約: なし",
+      "pathRestriction": null,
+      "outputPath": "/pool/incoming/",
+      "outputMode": "basename",
+      "outputReadableBy": ["root"],
+      "runSuccessTemplate": "{destPath} に集めました"
+    },
+    "packager": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "package_to",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run packager <ファイル> で梱包して /pool/packed/ に書き出す\n制約: /pool/incoming/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/pool/incoming/",
+      "outputPath": "/pool/packed/",
+      "outputMode": "basename",
+      "outputSuffix": ".pkg",
+      "outputReadableBy": ["root"],
+      "runSuccessTemplate": "{destPath} に梱包しました"
+    },
+    "viewer": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "decode_and_display",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: 指定ファイルを解読して表示する\n制約: /pool/packed/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/pool/packed/",
+      "displayHeaderTemplate": "--- {path} を解読 ---"
+    },
+    "labeler": {
+      "owner": "root",
+      "executableBy": ["guest", "root"],
+      "action": "label_file",
+      "inspectText": "所有者: root\n実行可: 全員\n動作: run labeler <ファイル> でラベルを貼る（表示内容は変化しません）\n制約: /pool/incoming/ 以下のファイルのみ受け付ける",
+      "pathRestriction": "/pool/incoming/",
+      "cosmeticOnly": true
+    }
+  }
+}
