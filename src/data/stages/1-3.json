@@ -6,7 +6,7 @@
   "lockCondition": "1-2 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "5533",
-  "storyText": "資料室の奥に社員証発行の記録があるらしい。root しか読めない台帳だが、\nバックアップ担当のツールが置いてあるのを見つけた。",
+  "storyText": "資料室の奥に社員証発行の記録があるらしい。root しか読めない台帳だが、\nバックアップ担当のツールが置いてあるのを見つけた。\n\nヒント: 台帳の場所は /root/idcard らしい。",
   "notice": "代行させたツールの出力先も、自分の権限で読めることがある",
   "filesystem": {
     "/home/guest": ["memo.txt", "backup"]

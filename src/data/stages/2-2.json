@@ -6,7 +6,7 @@
   "lockCondition": "2-1 をクリアすると解放",
   "newCommands": ["status"],
   "goalAnswer": "7712",
-  "storyText": "資料変換室に、フォーマット変換ツールと閲覧ツールが置いてある。\n閲覧ツールは /cache/ 以下しか見てくれないらしい。",
+  "storyText": "資料変換室に、フォーマット変換ツールと閲覧ツールが置いてある。\n閲覧ツールは /cache/ 以下しか見てくれないらしい。\n\nヒント: 目当てのファイルは /root/keystore らしい。",
   "notice": "形は変わっても、やることは拒否されたら別ルートを探すの繰り返し",
   "filesystem": {
     "/home/guest": ["converter", "reader"]

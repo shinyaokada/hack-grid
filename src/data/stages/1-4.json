@@ -6,7 +6,7 @@
   "lockCondition": "1-3 をクリアすると解放",
   "newCommands": ["back"],
   "goalAnswer": "8264",
-  "storyText": "通用口の暗証番号が変更されたらしい。記録はログに残るはずだが、\nログファイル自体は root しか読めない。",
+  "storyText": "通用口の暗証番号が変更されたらしい。記録はログに残るはずだが、\nログファイル自体は root しか読めない。\n\nヒント: 変更前の番号は /root/gatecode に、ログは /var/log/access.log にあるらしい。",
   "notice": "危なそうな操作をしても、back があれば安心して試せる",
   "filesystem": {
     "/home/guest": ["memo.txt", "logger", "shredder"]

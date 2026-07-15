@@ -6,7 +6,7 @@
   "lockCondition": "2-2 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "1849",
-  "storyText": "共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは\n/share/ 以下しか受け付けない。",
+  "storyText": "共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは\n/share/ 以下しか受け付けない。\n\nヒント: 目当てのファイルは /root/manifest らしい。",
   "notice": "圧縮も変換もコピーも、結局は経由地を作るという同じ発想",
   "filesystem": {
     "/home/guest": ["archiver", "extractor"]

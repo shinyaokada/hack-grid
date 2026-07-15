@@ -6,7 +6,7 @@
   "lockCondition": "2-3 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "6027",
-  "storyText": "倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は\n経由地が二段階ある。",
+  "storyText": "倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は\n経由地が二段階ある。\n\nヒント: 目当てのファイルは /root/vaultcore らしい。",
   "notice": "経由地が増えても、拒否→次のツールを探す、を繰り返すだけでいい",
   "filesystem": {
     "/home/guest": ["collector", "packager", "viewer", "labeler"]
