@@ -26,13 +26,16 @@ function sessionReducer(session: Session, command: Command): Session {
 export function CliTerminal({
   stage,
   onGoalReady,
+  usedCommands,
+  onCommandUsed,
 }: {
   stage: StageDefinition;
   onGoalReady: (ready: boolean) => void;
+  usedCommands: Set<CommandName>;
+  onCommandUsed: (name: CommandName) => void;
 }) {
   const [session, dispatch] = useReducer(sessionReducer, stage, createSession);
   const [pending, setPending] = useState<Pending>(null);
-  const [seenCommands, setSeenCommands] = useState<Set<CommandName>>(new Set());
 
   const state = session.state;
 
@@ -46,7 +49,7 @@ export function CliTerminal({
   }
 
   function onPickCommand(name: CommandName) {
-    setSeenCommands((prev) => new Set(prev).add(name));
+    onCommandUsed(name);
     switch (name) {
       case "ls":
       case "status":
@@ -123,7 +126,7 @@ export function CliTerminal({
 
       <div className="flex flex-wrap gap-2">
         {COMMANDS.map((c) => {
-          const isNew = stage.newCommands.includes(c.name) && !seenCommands.has(c.name);
+          const isNew = stage.newCommands.includes(c.name) && !usedCommands.has(c.name);
           return (
             <button
               key={c.name}
