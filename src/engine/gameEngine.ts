@@ -9,6 +9,7 @@ import {
   handleRun,
   handleStatus,
 } from "@/engine/commands";
+import { parseInput } from "@/engine/parser";
 
 export function createSession(stage: StageDefinition): Session {
   const files: EngineState["files"] = {};
@@ -155,4 +156,23 @@ export function applyCommand(session: Session, command: Command): Session {
   state.log = [...state.log, logEntry];
 
   return { stage, state, past, nextLogId: session.nextLogId + 1 };
+}
+
+/** Parses a raw typed command line and applies it, or appends a rejection line if it doesn't parse. */
+export function applyRawInput(session: Session, raw: string): Session {
+  const parsed = parseInput(raw);
+  if ("error" in parsed) {
+    if (!parsed.error) return session; // blank submission: no-op
+    const state = structuredClone(session.state);
+    const logEntry: LogEntry = {
+      id: session.nextLogId,
+      commandText: raw.trim(),
+      lines: [parsed.error],
+      isError: true,
+      reverted: false,
+    };
+    state.log = [...state.log, logEntry];
+    return { ...session, state, nextLogId: session.nextLogId + 1 };
+  }
+  return applyCommand(session, parsed.command);
 }

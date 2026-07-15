@@ -1,26 +1,14 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import type { CommandName, StageDefinition } from "@/data/stageSchema";
-import { getKnownExistingPaths, getVisibleDirs, getVisibleTools } from "@/engine/candidates";
-import { applyCommand, createSession } from "@/engine/gameEngine";
-import type { Command, Session } from "@/engine/types";
+import { CommandDocs } from "@/components/CommandDocs";
+import { applyRawInput, createSession } from "@/engine/gameEngine";
+import { parseInput } from "@/engine/parser";
+import type { Session } from "@/engine/types";
 
-const COMMANDS: { name: CommandName; label: string }[] = [
-  { name: "ls", label: "ls" },
-  { name: "inspect", label: "inspect" },
-  { name: "read", label: "read" },
-  { name: "cd", label: "cd" },
-  { name: "run", label: "run" },
-  { name: "status", label: "status" },
-  { name: "help", label: "help" },
-  { name: "back", label: "back" },
-];
-
-type Pending = null | { type: "cd" | "read" | "inspect" } | { type: "run"; tool?: string };
-
-function sessionReducer(session: Session, command: Command): Session {
-  return applyCommand(session, command);
+function sessionReducer(session: Session, raw: string): Session {
+  return applyRawInput(session, raw);
 }
 
 export function CliTerminal({
@@ -35,7 +23,10 @@ export function CliTerminal({
   onCommandUsed: (name: CommandName) => void;
 }) {
   const [session, dispatch] = useReducer(sessionReducer, stage, createSession);
-  const [pending, setPending] = useState<Pending>(null);
+  const [input, setInput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+  const logEndRef = useRef<HTMLDivElement>(null);
 
   const state = session.state;
 
@@ -43,132 +34,90 @@ export function CliTerminal({
     onGoalReady(state.goalRevealed);
   }, [state.goalRevealed, onGoalReady]);
 
-  function run(command: Command) {
-    dispatch(command);
-    setPending(null);
-  }
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ block: "end" });
+  }, [state.log.length]);
 
-  function onPickCommand(name: CommandName) {
-    onCommandUsed(name);
-    switch (name) {
-      case "ls":
-      case "status":
-      case "help":
-      case "back":
-        run({ type: name });
-        return;
-      case "cd":
-      case "read":
-      case "inspect":
-        setPending({ type: name });
-        return;
-      case "run":
-        setPending({ type: "run" });
-        return;
+  function submit(raw: string) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    const parsed = parseInput(trimmed);
+    if ("command" in parsed) {
+      onCommandUsed(parsed.command.type);
     }
+    dispatch(trimmed);
+    setHistory((prev) => [...prev, trimmed]);
+    setHistoryIndex(null);
+    setInput("");
   }
 
-  const visibleTools = getVisibleTools(stage, state);
-  const visibleDirs = getVisibleDirs(state);
-  const knownPaths = getKnownExistingPaths(state);
-
-  let candidates: string[] = [];
-  let candidateLabel = "";
-  if (pending?.type === "cd") {
-    candidates = visibleDirs;
-    candidateLabel = "移動先を選択";
-  } else if (pending?.type === "read") {
-    candidates = knownPaths;
-    candidateLabel = "読み取る対象を選択";
-  } else if (pending?.type === "inspect") {
-    candidates = visibleTools;
-    candidateLabel = "調べる対象を選択";
-  } else if (pending?.type === "run" && !pending.tool) {
-    candidates = visibleTools;
-    candidateLabel = "実行するツールを選択";
-  } else if (pending?.type === "run" && pending.tool) {
-    candidates = knownPaths;
-    candidateLabel = "引数（対象ファイル）を選択";
-  }
-
-  function onPickCandidate(value: string) {
-    if (!pending) return;
-    if (pending.type === "run") {
-      if (!pending.tool) {
-        setPending({ type: "run", tool: value });
-        return;
-      }
-      run({ type: "run", tool: pending.tool, arg: value });
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submit(input);
       return;
     }
-    run({ type: pending.type, target: value });
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (history.length === 0) return;
+      const nextIndex = historyIndex === null ? history.length - 1 : Math.max(0, historyIndex - 1);
+      setHistoryIndex(nextIndex);
+      setInput(history[nextIndex]);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIndex === null) return;
+      const nextIndex = historyIndex + 1;
+      if (nextIndex >= history.length) {
+        setHistoryIndex(null);
+        setInput("");
+      } else {
+        setHistoryIndex(nextIndex);
+        setInput(history[nextIndex]);
+      }
+    }
   }
 
   return (
-    <div className="flex flex-col gap-3 font-mono text-sm text-green-200">
-      <div className="h-80 overflow-y-auto rounded border border-green-900 bg-black/80 p-3">
-        {state.log.length === 0 && <div className="text-green-700">$ _</div>}
-        {state.log.map((entry) => (
-          <div key={entry.id} className={entry.reverted ? "opacity-40" : ""}>
-            <div className="text-green-400">$ {entry.commandText}</div>
-            {entry.lines.map((line, i) => (
-              <div
-                key={i}
-                className={entry.isError ? "text-red-400" : "whitespace-pre-wrap text-green-200"}
-              >
-                {line}
-              </div>
-            ))}
-            {entry.reverted && <div className="text-yellow-500">（取り消し済み）</div>}
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {COMMANDS.map((c) => {
-          const isNew = stage.newCommands.includes(c.name) && !usedCommands.has(c.name);
-          return (
-            <button
-              key={c.name}
-              onClick={() => onPickCommand(c.name)}
-              className="relative rounded border border-green-700 bg-green-950 px-3 py-1 hover:bg-green-900"
-            >
-              {c.label}
-              {isNew && (
-                <span className="absolute -right-2 -top-2 rounded bg-yellow-500 px-1 text-[10px] font-bold text-black">
-                  NEW
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {pending && (
-        <div className="flex flex-col gap-2 rounded border border-green-900 p-2">
-          <div className="text-green-500">{candidateLabel}</div>
-          <div className="flex flex-wrap gap-2">
-            {candidates.length === 0 && (
-              <span className="text-green-700">（候補がありません）</span>
-            )}
-            {candidates.map((value) => (
-              <button
-                key={value}
-                onClick={() => onPickCandidate(value)}
-                className="rounded border border-green-700 px-2 py-1 hover:bg-green-900"
-              >
-                {value}
-              </button>
-            ))}
-            <button
-              onClick={() => setPending(null)}
-              className="rounded border border-red-800 px-2 py-1 text-red-400 hover:bg-red-950"
-            >
-              キャンセル
-            </button>
-          </div>
+    <div className="flex flex-col gap-4 font-mono text-sm text-green-200 md:flex-row">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="h-80 overflow-y-auto rounded border border-green-900 bg-black/80 p-3">
+          {state.log.length === 0 && <div className="text-green-700">$ _</div>}
+          {state.log.map((entry) => (
+            <div key={entry.id} className={entry.reverted ? "opacity-40" : ""}>
+              <div className="text-green-400">$ {entry.commandText}</div>
+              {entry.lines.map((line, i) => (
+                <div
+                  key={i}
+                  className={entry.isError ? "text-red-400" : "whitespace-pre-wrap text-green-200"}
+                >
+                  {line}
+                </div>
+              ))}
+              {entry.reverted && <div className="text-yellow-500">（取り消し済み）</div>}
+            </div>
+          ))}
+          <div ref={logEndRef} />
         </div>
-      )}
+
+        <div className="flex items-center gap-2 rounded border border-green-700 bg-black px-2 py-1">
+          <span className="text-green-500">$</span>
+          <input
+            autoFocus
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
+            spellCheck={false}
+            autoComplete="off"
+            aria-label="コマンド入力"
+            className="flex-1 bg-transparent text-green-200 outline-none"
+            placeholder="コマンドを入力（例: ls）"
+          />
+        </div>
+      </div>
+
+      <CommandDocs stage={stage} usedCommands={usedCommands} />
     </div>
   );
 }

@@ -57,7 +57,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black px-4 py-6 text-green-200">
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-4xl">
         <h1 className="mb-6 text-center font-mono text-xl text-green-400">
           $ ハッキング風パズルゲーム
         </h1>
