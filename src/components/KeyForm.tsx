@@ -8,12 +8,10 @@ export function KeyForm({
   digits,
   answer,
   onCorrect,
-  onBack,
 }: {
   digits: number;
   answer: string;
   onCorrect: () => void;
-  onBack: () => void;
 }) {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
@@ -25,6 +23,7 @@ export function KeyForm({
       return;
     }
     if (key === "OK") {
+      if (value.length !== digits) return;
       if (value === answer) {
         onCorrect();
       } else {
@@ -39,8 +38,8 @@ export function KeyForm({
   }
 
   return (
-    <div className="mx-auto flex max-w-xs flex-col items-center gap-4 text-center">
-      <div className="text-green-300">見つけた番号を入力してください</div>
+    <div className="flex w-full shrink-0 flex-col items-center gap-3 rounded border border-green-900 bg-black/60 p-3 text-center md:w-64">
+      <div className="text-green-300">見つけた番号を入力</div>
       <div className="flex gap-2">
         {Array.from({ length: digits }).map((_, i) => (
           <div
@@ -51,21 +50,18 @@ export function KeyForm({
           </div>
         ))}
       </div>
-      {error && <div className="text-red-400">番号が違います。もう一度確認しよう</div>}
+      {error && <div className="text-xs text-red-400">番号が違います。もう一度確認しよう</div>}
       <div className="grid grid-cols-3 gap-2">
         {KEYS.map((k) => (
           <button
             key={k}
-            className="rounded border border-green-700 px-4 py-2 font-mono hover:bg-green-900"
+            className="rounded border border-green-700 px-3 py-2 font-mono hover:bg-green-900"
             onClick={() => handleKey(k)}
           >
             {k}
           </button>
         ))}
       </div>
-      <button className="text-green-500 underline" onClick={onBack}>
-        CLI画面に戻って確認する
-      </button>
     </div>
   );
 }

@@ -13,12 +13,10 @@ function sessionReducer(session: Session, raw: string): Session {
 
 export function CliTerminal({
   stage,
-  onGoalReady,
   usedCommands,
   onCommandUsed,
 }: {
   stage: StageDefinition;
-  onGoalReady: (ready: boolean) => void;
   usedCommands: Set<CommandName>;
   onCommandUsed: (name: CommandName) => void;
 }) {
@@ -27,12 +25,9 @@ export function CliTerminal({
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const state = session.state;
-
-  useEffect(() => {
-    onGoalReady(state.goalRevealed);
-  }, [state.goalRevealed, onGoalReady]);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ block: "end" });
@@ -81,29 +76,28 @@ export function CliTerminal({
 
   return (
     <div className="flex flex-col gap-4 font-mono text-sm text-green-200 md:flex-row">
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="h-80 overflow-y-auto rounded border border-green-900 bg-black/80 p-3">
-          {state.log.length === 0 && <div className="text-green-700">$ _</div>}
-          {state.log.map((entry) => (
-            <div key={entry.id} className={entry.reverted ? "opacity-40" : ""}>
-              <div className="text-green-400">$ {entry.commandText}</div>
-              {entry.lines.map((line, i) => (
-                <div
-                  key={i}
-                  className={entry.isError ? "text-red-400" : "whitespace-pre-wrap text-green-200"}
-                >
-                  {line}
-                </div>
-              ))}
-              {entry.reverted && <div className="text-yellow-500">（取り消し済み）</div>}
-            </div>
-          ))}
-          <div ref={logEndRef} />
-        </div>
-
-        <div className="flex items-center gap-2 rounded border border-green-700 bg-black px-2 py-1">
+      <div
+        className="h-80 min-w-0 flex-1 cursor-text overflow-y-auto rounded border border-green-900 bg-black/80 p-3"
+        onClick={() => inputRef.current?.focus()}
+      >
+        {state.log.map((entry) => (
+          <div key={entry.id} className={entry.reverted ? "opacity-40" : ""}>
+            <div className="text-green-400">$ {entry.commandText}</div>
+            {entry.lines.map((line, i) => (
+              <div
+                key={i}
+                className={entry.isError ? "text-red-400" : "whitespace-pre-wrap text-green-200"}
+              >
+                {line}
+              </div>
+            ))}
+            {entry.reverted && <div className="text-yellow-500">（取り消し済み）</div>}
+          </div>
+        ))}
+        <div className="flex items-center gap-2">
           <span className="text-green-500">$</span>
           <input
+            ref={inputRef}
             autoFocus
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -112,9 +106,9 @@ export function CliTerminal({
             autoComplete="off"
             aria-label="コマンド入力"
             className="flex-1 bg-transparent text-green-200 outline-none"
-            placeholder="コマンドを入力（例: ls）"
           />
         </div>
+        <div ref={logEndRef} />
       </div>
 
       <CommandDocs stage={stage} usedCommands={usedCommands} />

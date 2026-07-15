@@ -11,7 +11,7 @@ import { TitleScreen } from "@/components/TitleScreen";
 import { getNextStageId, getStageById, STAGES } from "@/data/stages";
 import { useProgress } from "@/hooks/useProgress";
 
-type Screen = "title" | "picker" | "story" | "cli" | "keyform" | "clear";
+type Screen = "title" | "picker" | "story" | "cli" | "clear";
 
 const FIRST_STAGE_ID = STAGES[0].stage;
 
@@ -19,7 +19,6 @@ export default function Home() {
   const progress = useProgress();
   const [screen, setScreen] = useState<Screen>("title");
   const [stageId, setStageId] = useState<string>(FIRST_STAGE_ID);
-  const [goalReady, setGoalReady] = useState(false);
   const [showHomeGuide, setShowHomeGuide] = useState(false);
 
   const stage = getStageById(stageId);
@@ -27,7 +26,6 @@ export default function Home() {
 
   function selectStage(id: string) {
     setStageId(id);
-    setGoalReady(false);
     setScreen("story");
   }
 
@@ -82,34 +80,17 @@ export default function Home() {
         {screen === "story" && <StoryScreen stage={stage} onStart={() => setScreen("cli")} />}
 
         {screen === "cli" && (
-          <div className="flex flex-col gap-4">
-            <CliTerminal
-              key={stage.stage}
-              stage={stage}
-              onGoalReady={setGoalReady}
-              usedCommands={progress.usedCommands}
-              onCommandUsed={progress.markCommandUsed}
-            />
-            {goalReady && (
-              <div className="text-center">
-                <button
-                  onClick={() => setScreen("keyform")}
-                  className="rounded border border-yellow-600 bg-yellow-900/30 px-4 py-2 text-yellow-300 hover:bg-yellow-900/60"
-                >
-                  回答する
-                </button>
-              </div>
-            )}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+            <div className="min-w-0 flex-1">
+              <CliTerminal
+                key={stage.stage}
+                stage={stage}
+                usedCommands={progress.usedCommands}
+                onCommandUsed={progress.markCommandUsed}
+              />
+            </div>
+            <KeyForm digits={stage.goalAnswer.length} answer={stage.goalAnswer} onCorrect={handleCleared} />
           </div>
-        )}
-
-        {screen === "keyform" && (
-          <KeyForm
-            digits={stage.goalAnswer.length}
-            answer={stage.goalAnswer}
-            onCorrect={handleCleared}
-            onBack={() => setScreen("cli")}
-          />
         )}
 
         {screen === "clear" && (
