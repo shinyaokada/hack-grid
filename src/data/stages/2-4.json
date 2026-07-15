@@ -6,12 +6,17 @@
   "lockCondition": "2-3 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "6027",
-  "storyText": "倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は\n経由地が二段階ある。\n\nヒント: 目当てのファイルは /root/vaultcore らしい。",
+  "storyText": "倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は\n経由地が二段階ある。",
   "notice": "経由地が増えても、拒否→次のツールを探す、を繰り返すだけでいい",
   "filesystem": {
-    "/home/guest": ["collector", "packager", "viewer", "labeler"]
+    "/home/guest": ["memo.txt", "collector", "packager", "viewer", "labeler"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root"],
+      "content": "倉庫のメモ: 金庫本体の最終コードは /root/vaultcore に保管されているとのこと。"
+    },
     "/root/vaultcore": {
       "owner": "root",
       "readableBy": ["root"],

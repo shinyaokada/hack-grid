@@ -123,14 +123,22 @@ Screens.md 6章で確定済み（Overview.md サンプル盤面 Lv1 に対応）
 ### ストーリー
 
 > 受付のメモにあった一文が気になる。金庫の本当の番号は、root しか読めないファイルの中にあるらしい。
->
-> ヒント: 気になるファイルは `/root/note` らしい。
+
+### 設計意図（発見方法について）
+
+ストーリー画面では「root しか読めないファイルの中にあるらしい」としか語らず、正確なパスは教えない。かわりに `/home/guest/memo.txt`（受付担当の引き継ぎメモ）に `/root/note` という具体的なパスを書いておき、`ls` → `read memo.txt` という**ゲーム内の調査行動**で発見させる。ナレーションが答えを教える形を避け、「怪しいメモを読む」という捜査的な手触りにするための設計。
 
 ### 攻略フロー
 
 ```
 $ ls
 memo.txt  printer
+
+$ read memo.txt
+--- memo.txt ---
+引き継ぎメモ:
+『金庫番号の確認は /root/note を参照のこと』とのこと。
+（root権限が要るらしく、まだ自分では見られていない……）
 
 $ read /root/note
 拒否: root のみ読み取り可（あなた: guest）
@@ -168,6 +176,11 @@ $ run printer /root/note
     "/home/guest": ["memo.txt", "printer"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
+    },
     "/root/note": {
       "owner": "root",
       "readable_by": ["root"],
@@ -205,14 +218,17 @@ $ run printer /root/note
 ### ストーリー
 
 > 資料室の奥に社員証発行の記録があるらしい。root しか読めない台帳だが、バックアップ担当のツールが置いてあるのを見つけた。
->
-> ヒント: 台帳の場所は `/root/idcard` らしい。
 
 ### 攻略フロー
 
 ```
 $ ls
 memo.txt  backup
+
+$ read memo.txt
+--- memo.txt ---
+資料室担当より: 社員証台帳（/root/idcard）は root 権限のため私も直接は見られません。
+バックアップの複製はいつも /backup/ に置いています。
 
 $ read /root/idcard
 拒否: root のみ読み取り可（あなた: guest）
@@ -236,6 +252,7 @@ $ read /backup/idcard
 
 - 1-2 との違いは「ツールの出力そのものがゴールではなく、出力先を自分で `read` する」という一手増。プレイヤーの手順は変わらず `inspect → run → read` だが、`printer` が「表示するだけ」なのに対し `backup` は「複製するだけ」で、続きを自分でやる必要があると気づかせる。
 - `/backup/idcard` は複製先として **guest にも読めるパーミッション** を持つ世界読み取り可能な棚という設定（バックアップ倉庫は誰でも閲覧できる、という手触りの違いを出す）。
+- 1-2 と同様、正確なパス（`/root/idcard`）はストーリー画面では語らず、`memo.txt` を `read` して発見する。
 
 ### ゴール・クリア演出
 
@@ -259,6 +276,11 @@ $ read /backup/idcard
     "/home/guest": ["memo.txt", "backup"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "資料室担当より: 社員証台帳（/root/idcard）は root 権限のため私も直接は見られません。\nバックアップの複製はいつも /backup/ に置いています。"
+    },
     "/root/idcard": {
       "owner": "root",
       "readable_by": ["root"],
@@ -303,14 +325,17 @@ $ read /backup/idcard
 ### ストーリー
 
 > 通用口の暗証番号が変更されたらしい。記録はログに残るはずだが、ログファイル自体は root しか読めない。
->
-> ヒント: 変更前の番号は `/root/gatecode` に、ログは `/var/log/access.log` にあるらしい。
 
 ### 攻略フロー
 
 ```
 $ ls
 memo.txt  logger  shredder
+
+$ read memo.txt
+--- memo.txt ---
+変更前の番号は /root/gatecode に残っているはず。
+通用口の変更履歴は /var/log/access.log に残るらしい。
 
 $ read /root/gatecode
 拒否: root のみ読み取り可（あなた: guest）
@@ -378,6 +403,11 @@ $ read /root/gatecode
     "/home/guest": ["memo.txt", "logger", "shredder"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "変更前の番号は /root/gatecode に残っているはず。\n通用口の変更履歴は /var/log/access.log に残るらしい。"
+    },
     "/root/gatecode": {
       "owner": "root",
       "readable_by": ["root"],
@@ -430,14 +460,16 @@ $ read /root/gatecode
 ### ストーリー
 
 > サーバー室の暗証番号が知りたい。ここの printer は `/tmp/` 以下のファイルしか受け付けないよう制限されている。
->
-> ヒント: 目当てのファイルは `/root/serverroom` らしい。
 
 ### 攻略フロー
 
 ```
 $ ls
-exporter  printer
+memo.txt  exporter  printer
+
+$ read memo.txt
+--- memo.txt ---
+搬入口メモ: サーバー室の暗証番号は /root/serverroom に記録されているらしい。
 
 $ inspect printer
 所有者: root
@@ -488,9 +520,14 @@ $ run printer /tmp/out
   "lock_condition": "1-4 をクリアすると解放",
   "goal": { "type": "run_output", "tool": "printer", "path": "/tmp/out", "answer": "3390" },
   "filesystem": {
-    "/home/guest": ["exporter", "printer"]
+    "/home/guest": ["memo.txt", "exporter", "printer"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "搬入口メモ: サーバー室の暗証番号は /root/serverroom に記録されているらしい。"
+    },
     "/root/serverroom": {
       "owner": "root",
       "readable_by": ["root"],
@@ -541,8 +578,6 @@ $ run printer /tmp/out
 ### ストーリー
 
 > 資料変換室に、フォーマット変換ツールと閲覧ツールが置いてある。閲覧ツールは `/cache/` 以下しか見てくれないらしい。
->
-> ヒント: 目当てのファイルは `/root/keystore` らしい。
 
 ### 攻略フロー
 
@@ -551,7 +586,11 @@ $ status
 端末: reception-pc / 権限: guest / 現在地: /home/guest / 接続履歴: なし
 
 $ ls
-converter  reader
+memo.txt  converter  reader
+
+$ read memo.txt
+--- memo.txt ---
+資料変換室のメモ: 予備鍵の保管場所は /root/keystore です。
 
 $ inspect reader
 所有者: root
@@ -602,9 +641,14 @@ $ run reader /cache/keystore.conv
   "lock_condition": "2-1 をクリアすると解放",
   "goal": { "type": "run_output", "tool": "reader", "path": "/cache/keystore.conv", "answer": "7712" },
   "filesystem": {
-    "/home/guest": ["converter", "reader"]
+    "/home/guest": ["memo.txt", "converter", "reader"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "資料変換室のメモ: 予備鍵の保管場所は /root/keystore です。"
+    },
     "/root/keystore": {
       "owner": "root",
       "readable_by": ["root"],
@@ -656,14 +700,16 @@ $ run reader /cache/keystore.conv
 ### ストーリー
 
 > 共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは `/share/` 以下しか受け付けない。
->
-> ヒント: 目当てのファイルは `/root/manifest` らしい。
 
 ### 攻略フロー
 
 ```
 $ ls
-archiver  extractor
+memo.txt  archiver  extractor
+
+$ read memo.txt
+--- memo.txt ---
+共有フォルダのメモ: 積み荷リストの照合コードは /root/manifest にあるようです。
 
 $ inspect extractor
 所有者: root
@@ -713,9 +759,14 @@ $ run extractor /share/manifest.zip
   "lock_condition": "2-2 をクリアすると解放",
   "goal": { "type": "run_output", "tool": "extractor", "path": "/share/manifest.zip", "answer": "1849" },
   "filesystem": {
-    "/home/guest": ["archiver", "extractor"]
+    "/home/guest": ["memo.txt", "archiver", "extractor"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "共有フォルダのメモ: 積み荷リストの照合コードは /root/manifest にあるようです。"
+    },
     "/root/manifest": {
       "owner": "root",
       "readable_by": ["root"],
@@ -767,14 +818,16 @@ $ run extractor /share/manifest.zip
 ### ストーリー
 
 > 倉庫の奥、金庫本体の最終コードにたどり着けそうだ。ただし今回は経由地が二段階ある。
->
-> ヒント: 目当てのファイルは `/root/vaultcore` らしい。
 
 ### 攻略フロー
 
 ```
 $ ls
-collector  packager  viewer  labeler
+memo.txt  collector  packager  viewer  labeler
+
+$ read memo.txt
+--- memo.txt ---
+倉庫のメモ: 金庫本体の最終コードは /root/vaultcore に保管されているとのこと。
 
 $ inspect viewer
 所有者: root
@@ -839,9 +892,14 @@ $ run viewer /pool/packed/vaultcore.pkg
   "lock_condition": "2-3 をクリアすると解放",
   "goal": { "type": "run_output", "tool": "viewer", "path": "/pool/packed/vaultcore.pkg", "answer": "6027" },
   "filesystem": {
-    "/home/guest": ["collector", "packager", "viewer", "labeler"]
+    "/home/guest": ["memo.txt", "collector", "packager", "viewer", "labeler"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readable_by": ["guest", "root"],
+      "content": "倉庫のメモ: 金庫本体の最終コードは /root/vaultcore に保管されているとのこと。"
+    },
     "/root/vaultcore": {
       "owner": "root",
       "readable_by": ["root"],
@@ -904,3 +962,4 @@ $ run viewer /pool/packed/vaultcore.pkg
 - [ ] `inspect` `run` の初出ヒントは 1-2、`back` の初出ヒントは 1-4、`status` の初出ヒントは 2-2 に一度だけ出す（Screens.md 5章のNEWバッジ仕様に準拠）
 - [ ] 各ステージの `tools` はステージJSONにのみ存在し、エンジン本体のコード変更を伴わない（Overview.md「新ステージ追加＝JSONを1個書くだけ」を満たす）
 - [ ] 1-3 の `/backup/idcard` と 2-1〜2-4 の中間生成物（`/tmp/out` 等）で「出力先が読めるケース／読めないケース」の両方を経験させ、スキンごとの手触りの違いを維持している
+- [ ] **root専有ファイルの正確なパスは、ストーリー画面のナレーションでは明かさない。** かならず `ls` で見える範囲に guest が `read` できる「メモ」（引き継ぎメモ・室内メモ等）を1つ置き、そこにパスを書く。プレイヤーがゲーム内の調査行動（`ls`→`read`）だけでパスを発見できることを、ステージ追加のたびに確認する

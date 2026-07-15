@@ -6,6 +6,12 @@ import { runScript } from "./testHelpers";
 const stage = parseStage(stage2_4);
 
 describe("stage 2-4: 倉庫の奥 (Chain / 3-hop collector -> packager -> viewer)", () => {
+  it("the target path is discoverable via the warehouse's memo", () => {
+    const { steps } = runScript(stage, ["read memo.txt"]);
+    expect(steps[0].isError).toBe(false);
+    expect(steps[0].lines.join("\n")).toContain("/root/vaultcore");
+  });
+
   it("packager refuses a path outside /pool/incoming/", () => {
     const { steps } = runScript(stage, ["run packager /root/vaultcore"]);
     expect(steps[0].isError).toBe(true);

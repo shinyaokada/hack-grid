@@ -6,6 +6,12 @@ import { runScript } from "./testHelpers";
 const stage = parseStage(stage2_3);
 
 describe("stage 2-3: 共有フォルダ (Chain / archiver -> extractor)", () => {
+  it("the target path is discoverable via the folder's memo", () => {
+    const { steps } = runScript(stage, ["read memo.txt"]);
+    expect(steps[0].isError).toBe(false);
+    expect(steps[0].lines.join("\n")).toContain("/root/manifest");
+  });
+
   it("archiver -> extractor chain reveals 1849", () => {
     const { steps } = runScript(stage, [
       "run extractor /root/manifest",

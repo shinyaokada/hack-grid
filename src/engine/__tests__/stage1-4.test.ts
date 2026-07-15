@@ -7,6 +7,13 @@ import { cmd, runScript } from "./testHelpers";
 const stage = parseStage(stage1_4);
 
 describe("stage 1-4: 通用口ログ (Confused Deputy / logger + back)", () => {
+  it("both target paths are discoverable via the gate's memo", () => {
+    const { steps } = runScript(stage, ["read memo.txt"]);
+    expect(steps[0].isError).toBe(false);
+    expect(steps[0].lines.join("\n")).toContain("/root/gatecode");
+    expect(steps[0].lines.join("\n")).toContain("/var/log/access.log");
+  });
+
   it("run logger then read the log reveals 8264", () => {
     const { steps } = runScript(stage, [
       "read /root/gatecode",

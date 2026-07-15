@@ -6,6 +6,13 @@ import { runScript } from "./testHelpers";
 const stage = parseStage(stage2_1);
 
 describe("stage 2-1: サーバー室・搬入口 (Chain / exporter -> printer)", () => {
+  it("the target path is discoverable in-game via ls + read, not just via story text", () => {
+    const { steps } = runScript(stage, ["ls", "read memo.txt"]);
+    expect(steps[0].lines[0]).toContain("memo.txt");
+    expect(steps[1].isError).toBe(false);
+    expect(steps[1].lines.join("\n")).toContain("/root/serverroom");
+  });
+
   it("printer refuses paths outside /tmp/", () => {
     const { steps } = runScript(stage, ["run printer /root/serverroom"]);
     expect(steps[0].isError).toBe(true);

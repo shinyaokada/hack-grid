@@ -6,6 +6,12 @@ import { runScript } from "./testHelpers";
 const stage = parseStage(stage2_2);
 
 describe("stage 2-2: 資料変換室 (Chain / converter -> reader)", () => {
+  it("the target path is discoverable via the room's memo", () => {
+    const { steps } = runScript(stage, ["read memo.txt"]);
+    expect(steps[0].isError).toBe(false);
+    expect(steps[0].lines.join("\n")).toContain("/root/keystore");
+  });
+
   it("status works even though it doesn't touch the puzzle", () => {
     const { steps } = runScript(stage, ["status"]);
     expect(steps[0].isError).toBe(false);

@@ -6,12 +6,17 @@
   "lockCondition": "1-4 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "3390",
-  "storyText": "サーバー室の暗証番号が知りたい。ここの printer は /tmp/ 以下の\nファイルしか受け付けないよう制限されている。\n\nヒント: 目当てのファイルは /root/serverroom らしい。",
+  "storyText": "サーバー室の暗証番号が知りたい。ここの printer は /tmp/ 以下の\nファイルしか受け付けないよう制限されている。",
   "notice": "直接渡せないなら、一度別のツールに処理させてから渡す",
   "filesystem": {
-    "/home/guest": ["exporter", "printer"]
+    "/home/guest": ["memo.txt", "exporter", "printer"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root"],
+      "content": "搬入口メモ: サーバー室の暗証番号は /root/serverroom に記録されているらしい。"
+    },
     "/root/serverroom": {
       "owner": "root",
       "readableBy": ["root"],

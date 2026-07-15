@@ -6,6 +6,12 @@ import { runScript } from "./testHelpers";
 const stage = parseStage(stage1_2);
 
 describe("stage 1-2: 受付端末・裏側 (Confused Deputy / printer)", () => {
+  it("the target path is discoverable via the handover memo", () => {
+    const { steps } = runScript(stage, ["read memo.txt"]);
+    expect(steps[0].isError).toBe(false);
+    expect(steps[0].lines.join("\n")).toContain("/root/note");
+  });
+
   it("direct read of /root/note is denied", () => {
     const { steps } = runScript(stage, ["read /root/note"]);
     expect(steps[0].isError).toBe(true);

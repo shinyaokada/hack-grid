@@ -6,12 +6,17 @@
   "lockCondition": "2-2 をクリアすると解放",
   "newCommands": [],
   "goalAnswer": "1849",
-  "storyText": "共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは\n/share/ 以下しか受け付けない。\n\nヒント: 目当てのファイルは /root/manifest らしい。",
+  "storyText": "共有フォルダに積み荷リストの照合コードがあるらしい。展開ツールは\n/share/ 以下しか受け付けない。",
   "notice": "圧縮も変換もコピーも、結局は経由地を作るという同じ発想",
   "filesystem": {
-    "/home/guest": ["archiver", "extractor"]
+    "/home/guest": ["memo.txt", "archiver", "extractor"]
   },
   "files": {
+    "/home/guest/memo.txt": {
+      "owner": "guest",
+      "readableBy": ["guest", "root"],
+      "content": "共有フォルダのメモ: 積み荷リストの照合コードは /root/manifest にあるようです。"
+    },
     "/root/manifest": {
       "owner": "root",
       "readableBy": ["root"],

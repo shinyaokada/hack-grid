@@ -6,7 +6,7 @@
   "lockCondition": "1-1 をクリアすると解放",
   "newCommands": ["inspect", "run"],
   "goalAnswer": "4921",
-  "storyText": "受付のメモにあった一文が気になる。金庫の本当の番号は、root しか\n読めないファイルの中にあるらしい。\n\nヒント: 気になるファイルは /root/note らしい。",
+  "storyText": "受付のメモにあった一文が気になる。金庫の本当の番号は、root しか\n読めないファイルの中にあるらしい。",
   "notice": "自分は読めないが、ツールに代行させたら読めた",
   "filesystem": {
     "/home/guest": ["memo.txt", "printer"]
@@ -15,7 +15,7 @@
     "/home/guest/memo.txt": {
       "owner": "guest",
       "readableBy": ["guest", "root"],
-      "content": "今日の合言葉は 7008\n（本当に大事な金庫の番号は root にしか見られない場所にあるらしい……）"
+      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
     },
     "/root/note": {
       "owner": "root",
