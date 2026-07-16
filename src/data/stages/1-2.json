@@ -15,9 +15,9 @@
     "/home/guest/memo.txt": {
       "owner": "guest",
       "readableBy": ["guest", "root"],
-      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
+      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note.txt を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
     },
-    "/root/note": {
+    "/root/note.txt": {
       "owner": "root",
       "readableBy": ["root"],
       "content": "金庫の暗証番号は 4921"

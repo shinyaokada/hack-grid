@@ -56,7 +56,7 @@ describe("applyRawInput", () => {
 
   it("runs a recognized command line end-to-end", () => {
     let session = createSession(stage);
-    session = applyRawInput(session, "run printer /root/note");
+    session = applyRawInput(session, "run printer /root/note.txt");
     const entry = session.state.log[session.state.log.length - 1];
     expect(entry.isError).toBe(false);
     expect(entry.lines.join("\n")).toContain("4921");

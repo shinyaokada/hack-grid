@@ -33,10 +33,10 @@
 同じ `run` コマンドでも、渡す引数とツールの仕様の組み合わせで毎回違う問題になる。
 
 ```
-run printer /root/note     ← printerは表示するだけ
-run backup /root/note      ← backupはコピーする
-run mailer /root/note      ← mailerは送信する
-run exporter /root/note    ← exporterは別形式に変換する
+run printer /root/note.txt     ← printerは表示するだけ
+run backup /root/note.txt      ← backupはコピーする
+run mailer /root/note.txt      ← mailerは送信する
+run exporter /root/note.txt    ← exporterは別形式に変換する
 ```
 
 プレイヤーがやることは全部 `inspect` → `run` の2手。でも毎回別の謎に見える。
@@ -184,13 +184,13 @@ read が届く（ゴール）
 
 ### Lv1（パターン1-A）：プリンター越しに読む
 
-**状況**: `guest` 権限。`/root/note` を読みたい。
+**状況**: `guest` 権限。`/root/note.txt` を読みたい。
 
 ```
 $ ls
 memo.txt  printer
 
-$ read /root/note
+$ read /root/note.txt
 拒否: root のみ読み取り可（あなた: guest）
 
 $ inspect printer
@@ -198,9 +198,9 @@ $ inspect printer
 実行可: 全員
 動作: run printer <ファイル> でそのファイルの中身を表示する
 
-$ run printer /root/note
+$ run printer /root/note.txt
 [printer を root 権限で実行]
---- /root/note ---
+--- /root/note.txt ---
 金庫の暗証番号は 4921
 クリア
 ```
@@ -251,13 +251,13 @@ APIキー: sk-xxxx
   "stage": "1-A",
   "host": "reception-pc",
   "player": { "name": "guest" },
-  "goal": { "type": "read", "path": "/root/note" },
+  "goal": { "type": "read", "path": "/root/note.txt" },
   "filesystem": {
     "/home/guest": ["memo.txt", "printer"],
     "/root": ["note"]
   },
   "files": {
-    "/root/note": {
+    "/root/note.txt": {
       "owner": "root",
       "readable_by": ["root"],
       "content": "金庫の暗証番号は 4921"

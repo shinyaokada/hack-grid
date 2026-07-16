@@ -9,11 +9,11 @@ describe("stage 1-2: 受付端末・裏側 (Confused Deputy / printer)", () => {
   it("the target path is discoverable via the handover memo", () => {
     const { steps } = runScript(stage, ["read memo.txt"]);
     expect(steps[0].isError).toBe(false);
-    expect(steps[0].lines.join("\n")).toContain("/root/note");
+    expect(steps[0].lines.join("\n")).toContain("/root/note.txt");
   });
 
-  it("direct read of /root/note is denied", () => {
-    const { steps } = runScript(stage, ["read /root/note"]);
+  it("direct read of /root/note.txt is denied", () => {
+    const { steps } = runScript(stage, ["read /root/note.txt"]);
     expect(steps[0].isError).toBe(true);
     expect(steps[0].lines[0]).toBe("拒否: root のみ読み取り可（あなた: guest）");
   });
@@ -23,12 +23,12 @@ describe("stage 1-2: 受付端末・裏側 (Confused Deputy / printer)", () => {
     expect(steps[0].lines.join("\n")).toContain("run printer <ファイル>");
   });
 
-  it("run printer /root/note reveals the goal answer 4921", () => {
+  it("run printer /root/note.txt reveals the goal answer 4921", () => {
     const { steps } = runScript(stage, [
       "ls",
-      "read /root/note",
+      "read /root/note.txt",
       "inspect printer",
-      "run printer /root/note",
+      "run printer /root/note.txt",
     ]);
     const last = steps[steps.length - 1];
     expect(last.isError).toBe(false);

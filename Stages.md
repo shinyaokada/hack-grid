@@ -126,7 +126,7 @@ Screens.md 6章で確定済み（Overview.md サンプル盤面 Lv1 に対応）
 
 ### 設計意図（発見方法について）
 
-ストーリー画面では「root しか読めないファイルの中にあるらしい」としか語らず、正確なパスは教えない。かわりに `/home/guest/memo.txt`（受付担当の引き継ぎメモ）に `/root/note` という具体的なパスを書いておき、`ls` → `read memo.txt` という**ゲーム内の調査行動**で発見させる。ナレーションが答えを教える形を避け、「怪しいメモを読む」という捜査的な手触りにするための設計。
+ストーリー画面では「root しか読めないファイルの中にあるらしい」としか語らず、正確なパスは教えない。かわりに `/home/guest/memo.txt`（受付担当の引き継ぎメモ）に `/root/note.txt` という具体的なパスを書いておき、`ls` → `read memo.txt` という**ゲーム内の調査行動**で発見させる。ナレーションが答えを教える形を避け、「怪しいメモを読む」という捜査的な手触りにするための設計。
 
 ### 攻略フロー
 
@@ -137,10 +137,10 @@ memo.txt  printer
 $ read memo.txt
 --- memo.txt ---
 引き継ぎメモ:
-『金庫番号の確認は /root/note を参照のこと』とのこと。
+『金庫番号の確認は /root/note.txt を参照のこと』とのこと。
 （root権限が要るらしく、まだ自分では見られていない……）
 
-$ read /root/note
+$ read /root/note.txt
 拒否: root のみ読み取り可（あなた: guest）
 
 $ inspect printer
@@ -148,9 +148,9 @@ $ inspect printer
 実行可: 全員
 動作: run printer <ファイル> でそのファイルの中身を表示する
 
-$ run printer /root/note
+$ run printer /root/note.txt
 [printer を root 権限で実行]
---- /root/note ---
+--- /root/note.txt ---
 金庫の暗証番号は 4921
 ```
 
@@ -171,7 +171,7 @@ $ run printer /root/note
   "skin": "A_printer",
   "new_commands": ["inspect", "run"],
   "lock_condition": "1-1 をクリアすると解放",
-  "goal": { "type": "read", "path": "/root/note", "answer": "4921" },
+  "goal": { "type": "read", "path": "/root/note.txt", "answer": "4921" },
   "filesystem": {
     "/home/guest": ["memo.txt", "printer"]
   },
@@ -179,9 +179,9 @@ $ run printer /root/note
     "/home/guest/memo.txt": {
       "owner": "guest",
       "readable_by": ["guest", "root"],
-      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
+      "content": "引き継ぎメモ:\n『金庫番号の確認は /root/note.txt を参照のこと』とのこと。\n（root権限が要るらしく、まだ自分では見られていない……）"
     },
-    "/root/note": {
+    "/root/note.txt": {
       "owner": "root",
       "readable_by": ["root"],
       "content": "金庫の暗証番号は 4921"
