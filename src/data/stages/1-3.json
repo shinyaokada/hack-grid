@@ -15,9 +15,9 @@
     "/home/guest/memo.txt": {
       "owner": "guest",
       "readableBy": ["guest", "root"],
-      "content": "資料室担当より: 社員証台帳（/root/idcard）は root 権限のため私も直接は見られません。\nバックアップの複製はいつも /backup/ に置いています。"
+      "content": "資料室担当より: 社員証台帳（/root/idcard.csv）は root 権限のため私も直接は見られません。\nバックアップの複製はいつも /backup/ に置いています。"
     },
-    "/root/idcard": {
+    "/root/idcard.csv": {
       "owner": "root",
       "readableBy": ["root"],
       "content": "社員証の番号は 5533"

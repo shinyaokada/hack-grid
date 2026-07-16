@@ -227,10 +227,10 @@ memo.txt  backup
 
 $ read memo.txt
 --- memo.txt ---
-資料室担当より: 社員証台帳（/root/idcard）は root 権限のため私も直接は見られません。
+資料室担当より: 社員証台帳（/root/idcard.csv）は root 権限のため私も直接は見られません。
 バックアップの複製はいつも /backup/ に置いています。
 
-$ read /root/idcard
+$ read /root/idcard.csv
 拒否: root のみ読み取り可（あなた: guest）
 
 $ inspect backup
@@ -239,20 +239,20 @@ $ inspect backup
 動作: run backup <ファイル> で /backup/ に複製する
 制約: なし
 
-$ run backup /root/idcard
+$ run backup /root/idcard.csv
 [backup を root 権限で実行]
-/backup/idcard に複製しました
+/backup/idcard.csv に複製しました
 
-$ read /backup/idcard
---- /backup/idcard ---
+$ read /backup/idcard.csv
+--- /backup/idcard.csv ---
 社員証の番号は 5533
 ```
 
 ### 設計意図
 
 - 1-2 との違いは「ツールの出力そのものがゴールではなく、出力先を自分で `read` する」という一手増。プレイヤーの手順は変わらず `inspect → run → read` だが、`printer` が「表示するだけ」なのに対し `backup` は「複製するだけ」で、続きを自分でやる必要があると気づかせる。
-- `/backup/idcard` は複製先として **guest にも読めるパーミッション** を持つ世界読み取り可能な棚という設定（バックアップ倉庫は誰でも閲覧できる、という手触りの違いを出す）。
-- 1-2 と同様、正確なパス（`/root/idcard`）はストーリー画面では語らず、`memo.txt` を `read` して発見する。
+- `/backup/idcard.csv` は複製先として **guest にも読めるパーミッション** を持つ世界読み取り可能な棚という設定（バックアップ倉庫は誰でも閲覧できる、という手触りの違いを出す）。
+- 1-2 と同様、正確なパス（`/root/idcard.csv`）はストーリー画面では語らず、`memo.txt` を `read` して発見する。
 
 ### ゴール・クリア演出
 
@@ -271,7 +271,7 @@ $ read /backup/idcard
   "skin": "B_backup",
   "new_commands": [],
   "lock_condition": "1-2 をクリアすると解放",
-  "goal": { "type": "read", "path": "/backup/idcard", "answer": "5533" },
+  "goal": { "type": "read", "path": "/backup/idcard.csv", "answer": "5533" },
   "filesystem": {
     "/home/guest": ["memo.txt", "backup"]
   },
@@ -279,14 +279,14 @@ $ read /backup/idcard
     "/home/guest/memo.txt": {
       "owner": "guest",
       "readable_by": ["guest", "root"],
-      "content": "資料室担当より: 社員証台帳（/root/idcard）は root 権限のため私も直接は見られません。\nバックアップの複製はいつも /backup/ に置いています。"
+      "content": "資料室担当より: 社員証台帳（/root/idcard.csv）は root 権限のため私も直接は見られません。\nバックアップの複製はいつも /backup/ に置いています。"
     },
-    "/root/idcard": {
+    "/root/idcard.csv": {
       "owner": "root",
       "readable_by": ["root"],
       "content": "社員証の番号は 5533"
     },
-    "/backup/idcard": {
+    "/backup/idcard.csv": {
       "owner": "root",
       "readable_by": ["guest", "root"],
       "content": "社員証の番号は 5533",
@@ -961,5 +961,5 @@ $ run viewer /pool/packed/vaultcore.pkg
 - [ ] 鍵番号は全ステージ4桁の数字・重複なし（7008 / 4921 / 5533 / 8264 / 3390 / 7712 / 1849 / 6027）
 - [ ] `inspect` `run` の初出ヒントは 1-2、`back` の初出ヒントは 1-4、`status` の初出ヒントは 2-2 に一度だけ出す（Screens.md 5章のNEWバッジ仕様に準拠）
 - [ ] 各ステージの `tools` はステージJSONにのみ存在し、エンジン本体のコード変更を伴わない（Overview.md「新ステージ追加＝JSONを1個書くだけ」を満たす）
-- [ ] 1-3 の `/backup/idcard` と 2-1〜2-4 の中間生成物（`/tmp/out` 等）で「出力先が読めるケース／読めないケース」の両方を経験させ、スキンごとの手触りの違いを維持している
+- [ ] 1-3 の `/backup/idcard.csv` と 2-1〜2-4 の中間生成物（`/tmp/out` 等）で「出力先が読めるケース／読めないケース」の両方を経験させ、スキンごとの手触りの違いを維持している
 - [ ] **root専有ファイルの正確なパスは、ストーリー画面のナレーションでは明かさない。** かならず `ls` で見える範囲に guest が `read` できる「メモ」（引き継ぎメモ・室内メモ等）を1つ置き、そこにパスを書く。プレイヤーがゲーム内の調査行動（`ls`→`read`）だけでパスを発見できることを、ステージ追加のたびに確認する
