@@ -80,16 +80,28 @@ export default function Home() {
         {screen === "story" && <StoryScreen stage={stage} onStart={() => setScreen("cli")} />}
 
         {screen === "cli" && (
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-            <div className="min-w-0 flex-1">
-              <CliTerminal
-                key={stage.stage}
-                stage={stage}
-                usedCommands={progress.usedCommands}
-                onCommandUsed={progress.markCommandUsed}
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => setScreen("picker")}
+              className="self-start text-xs text-green-600 underline hover:text-green-400"
+            >
+              ← ステージ選択に戻る（詰まったらやり直せます）
+            </button>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+              <div className="min-w-0 flex-1">
+                <CliTerminal
+                  key={stage.stage}
+                  stage={stage}
+                  usedCommands={progress.usedCommands}
+                  onCommandUsed={progress.markCommandUsed}
+                />
+              </div>
+              <KeyForm
+                digits={stage.goalAnswer.length}
+                answer={stage.goalAnswer}
+                onCorrect={handleCleared}
               />
             </div>
-            <KeyForm digits={stage.goalAnswer.length} answer={stage.goalAnswer} onCorrect={handleCleared} />
           </div>
         )}
 

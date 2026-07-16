@@ -81,7 +81,7 @@ export function CliTerminal({
         onClick={() => inputRef.current?.focus()}
       >
         {state.log.map((entry) => (
-          <div key={entry.id} className={entry.reverted ? "opacity-40" : ""}>
+          <div key={entry.id}>
             <div className="text-green-400">$ {entry.commandText}</div>
             {entry.lines.map((line, i) => (
               <div
@@ -91,7 +91,6 @@ export function CliTerminal({
                 {line}
               </div>
             ))}
-            {entry.reverted && <div className="text-yellow-500">（取り消し済み）</div>}
           </div>
         ))}
         <div className="flex items-center gap-2">

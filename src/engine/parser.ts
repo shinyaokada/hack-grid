@@ -9,10 +9,9 @@ const COMMAND_NAMES: CommandName[] = [
   "run",
   "status",
   "help",
-  "back",
 ];
 
-const NO_ARG_COMMANDS: CommandName[] = ["ls", "status", "help", "back"];
+const NO_ARG_COMMANDS: CommandName[] = ["ls", "status", "help"];
 const ONE_ARG_COMMANDS: CommandName[] = ["cd", "read", "inspect"];
 
 export type ParseResult = { command: Command } | { error: string };
@@ -35,7 +34,7 @@ export function parseInput(raw: string): ParseResult {
     if (rest.length > 0) {
       return { error: `${commandName} は引数を取りません` };
     }
-    return { command: { type: commandName as "ls" | "status" | "help" | "back" } };
+    return { command: { type: commandName as "ls" | "status" | "help" } };
   }
 
   if (ONE_ARG_COMMANDS.includes(commandName)) {

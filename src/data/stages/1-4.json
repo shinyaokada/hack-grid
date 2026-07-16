@@ -4,10 +4,10 @@
   "host": "reception-pc",
   "playerRole": "guest",
   "lockCondition": "1-3 をクリアすると解放",
-  "newCommands": ["back"],
+  "newCommands": [],
   "goalAnswer": "8264",
   "storyText": "通用口の暗証番号が変更されたらしい。記録はログに残るはずだが、\nログファイル自体は root しか読めない。",
-  "notice": "危なそうな操作をしても、back があれば安心して試せる",
+  "notice": "物騒な名前のツールほど、run する前に inspect で確かめる",
   "filesystem": {
     "/home/guest": ["memo.txt", "logger", "shredder"]
   },

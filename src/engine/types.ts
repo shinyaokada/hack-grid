@@ -12,7 +12,6 @@ export interface LogEntry {
   commandText: string;
   lines: string[];
   isError: boolean;
-  reverted: boolean;
 }
 
 export interface EngineState {
@@ -25,19 +24,9 @@ export interface EngineState {
   log: LogEntry[];
 }
 
-export interface Snapshot {
-  files: Record<string, RuntimeFile>;
-  filesystem: Record<string, string[]>;
-  currentDir: string;
-  goalRevealed: boolean;
-  /** number of log entries that existed right before the mutating command ran */
-  logLength: number;
-}
-
 export interface Session {
   stage: StageDefinition;
   state: EngineState;
-  past: Snapshot[];
   nextLogId: number;
 }
 
@@ -48,12 +37,9 @@ export type Command =
   | { type: "inspect"; target: string }
   | { type: "run"; tool: string; arg?: string }
   | { type: "status" }
-  | { type: "help" }
-  | { type: "back" };
+  | { type: "help" };
 
 export interface CommandResult {
   lines: string[];
   isError: boolean;
-  /** true when this command changed file/filesystem state and should be undoable via `back` */
-  mutated?: boolean;
 }

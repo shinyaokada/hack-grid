@@ -22,12 +22,6 @@ const DOCS: { name: CommandName; syntax: string; desc: string; hint?: string }[]
     desc: "端末・権限・現在地・接続履歴をまとめて表示する",
     hint: "今の自分の状態をまとめて見たいときは status",
   },
-  {
-    name: "back",
-    syntax: "back",
-    desc: "直前の操作を取り消す",
-    hint: "一手戻したいときは back",
-  },
   { name: "help", syntax: "help", desc: "このコマンド一覧をログに表示する" },
 ];
 

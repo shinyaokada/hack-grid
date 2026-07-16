@@ -184,7 +184,6 @@ export function handleRun(
     return {
       lines: [`[${toolName} を root 権限で実行]`, message],
       isError: false,
-      mutated: true,
     };
   }
 
@@ -209,7 +208,6 @@ export function handleRun(
     return {
       lines: [`[${toolName} を root 権限で実行]`, message],
       isError: false,
-      mutated: true,
     };
   }
 
@@ -241,7 +239,6 @@ export function handleRun(
     return {
       lines: [`[${toolName} を root 権限で実行]`, message],
       isError: false,
-      mutated: true,
     };
   }
 

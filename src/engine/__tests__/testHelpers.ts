@@ -11,8 +11,6 @@ export function cmd(text: string): Command {
       return { type: "status" };
     case "help":
       return { type: "help" };
-    case "back":
-      return { type: "back" };
     case "cd":
       return { type: "cd", target: rest[0] };
     case "read":

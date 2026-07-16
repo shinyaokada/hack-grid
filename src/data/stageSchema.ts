@@ -27,7 +27,6 @@ export const CommandNameSchema = z.enum([
   "run",
   "status",
   "help",
-  "back",
 ]);
 export type CommandName = z.infer<typeof CommandNameSchema>;
 
