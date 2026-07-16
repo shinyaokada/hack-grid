@@ -18,7 +18,7 @@ export function StagePlayArea({ stage }: { stage: StageDefinition }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex h-[60vh] gap-2 overflow-x-auto">
+      <div className="flex h-[80vh] gap-2 overflow-x-auto">
         {Array.from({ length: paneCount }).map((_, i) => (
           <TerminalPane
             key={i}

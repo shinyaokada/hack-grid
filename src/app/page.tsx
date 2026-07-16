@@ -87,8 +87,16 @@ export default function Home() {
             >
               ← ステージ選択に戻る（詰まったらやり直せます）
             </button>
-            <StagePlayArea key={stage.stage} stage={stage} />
-            <KeyForm digits={stage.goalAnswer.length} answer={stage.goalAnswer} onCorrect={handleCleared} />
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+              <div className="min-w-0 flex-1">
+                <StagePlayArea key={stage.stage} stage={stage} />
+              </div>
+              <KeyForm
+                digits={stage.goalAnswer.length}
+                answer={stage.goalAnswer}
+                onCorrect={handleCleared}
+              />
+            </div>
           </div>
         )}
 
