@@ -12,6 +12,8 @@ export interface LogEntry {
   commandText: string;
   lines: string[];
   isError: boolean;
+  /** true for a synthetic entry the engine seeds itself (e.g. a new-command hint banner), not something the player typed */
+  isSystem?: boolean;
 }
 
 export interface EngineState {

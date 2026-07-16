@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CliTerminal } from "@/components/CliTerminal";
 import { ClearScreen } from "@/components/ClearScreen";
 import { HomeGuideOverlay } from "@/components/HomeGuideOverlay";
 import { KeyForm } from "@/components/KeyForm";
 import { StagePicker } from "@/components/StagePicker";
+import { StagePlayArea } from "@/components/StagePlayArea";
 import { StoryScreen } from "@/components/StoryScreen";
 import { TitleScreen } from "@/components/TitleScreen";
 import { getNextStageId, getStageById, STAGES } from "@/data/stages";
@@ -55,7 +55,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black px-4 py-6 text-green-200">
-      <div className="mx-auto max-w-4xl">
+      <div className={`mx-auto ${screen === "cli" ? "max-w-6xl" : "max-w-4xl"}`}>
         <h1 className="mb-6 text-center font-mono text-xl text-green-400">
           $ ハッキング風パズルゲーム
         </h1>
@@ -87,21 +87,8 @@ export default function Home() {
             >
               ← ステージ選択に戻る（詰まったらやり直せます）
             </button>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-              <div className="min-w-0 flex-1">
-                <CliTerminal
-                  key={stage.stage}
-                  stage={stage}
-                  usedCommands={progress.usedCommands}
-                  onCommandUsed={progress.markCommandUsed}
-                />
-              </div>
-              <KeyForm
-                digits={stage.goalAnswer.length}
-                answer={stage.goalAnswer}
-                onCorrect={handleCleared}
-              />
-            </div>
+            <StagePlayArea key={stage.stage} stage={stage} />
+            <KeyForm digits={stage.goalAnswer.length} answer={stage.goalAnswer} onCorrect={handleCleared} />
           </div>
         )}
 

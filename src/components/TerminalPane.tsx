@@ -1,26 +1,19 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState } from "react";
-import type { CommandName, StageDefinition } from "@/data/stageSchema";
-import { CommandDocs } from "@/components/CommandDocs";
-import { applyRawInput, createSession } from "@/engine/gameEngine";
-import { parseInput } from "@/engine/parser";
+import { useEffect, useRef, useState } from "react";
 import type { Session } from "@/engine/types";
 
-function sessionReducer(session: Session, raw: string): Session {
-  return applyRawInput(session, raw);
-}
-
-export function CliTerminal({
-  stage,
-  usedCommands,
-  onCommandUsed,
+export function TerminalPane({
+  label,
+  session,
+  dispatch,
+  onClose,
 }: {
-  stage: StageDefinition;
-  usedCommands: Set<CommandName>;
-  onCommandUsed: (name: CommandName) => void;
+  label: string;
+  session: Session;
+  dispatch: (raw: string) => void;
+  onClose?: () => void;
 }) {
-  const [session, dispatch] = useReducer(sessionReducer, stage, createSession);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
@@ -36,10 +29,6 @@ export function CliTerminal({
   function submit(raw: string) {
     const trimmed = raw.trim();
     if (!trimmed) return;
-    const parsed = parseInput(trimmed);
-    if ("command" in parsed) {
-      onCommandUsed(parsed.command.type);
-    }
     dispatch(trimmed);
     setHistory((prev) => [...prev, trimmed]);
     setHistoryIndex(null);
@@ -75,18 +64,32 @@ export function CliTerminal({
   }
 
   return (
-    <div className="flex flex-col gap-4 font-mono text-sm text-green-200 md:flex-row">
+    <div className="flex h-full min-w-[280px] flex-1 flex-col gap-1 font-mono text-sm text-green-200">
+      <div className="flex items-center justify-between text-xs text-green-700">
+        <span>{label}</span>
+        {onClose && (
+          <button onClick={onClose} className="px-1 text-red-500 hover:text-red-300">
+            ×閉じる
+          </button>
+        )}
+      </div>
       <div
-        className="h-80 min-w-0 flex-1 cursor-text overflow-y-auto rounded border border-green-900 bg-black/80 p-3"
+        className="min-h-0 flex-1 cursor-text overflow-y-auto rounded border border-green-900 bg-black/80 p-3"
         onClick={() => inputRef.current?.focus()}
       >
         {state.log.map((entry) => (
           <div key={entry.id}>
-            <div className="text-green-400">$ {entry.commandText}</div>
+            {!entry.isSystem && <div className="text-green-400">$ {entry.commandText}</div>}
             {entry.lines.map((line, i) => (
               <div
                 key={i}
-                className={entry.isError ? "text-red-400" : "whitespace-pre-wrap text-green-200"}
+                className={
+                  entry.isSystem
+                    ? "text-cyan-400"
+                    : entry.isError
+                      ? "text-red-400"
+                      : "whitespace-pre-wrap text-green-200"
+                }
               >
                 {line}
               </div>
@@ -109,8 +112,6 @@ export function CliTerminal({
         </div>
         <div ref={logEndRef} />
       </div>
-
-      <CommandDocs stage={stage} usedCommands={usedCommands} />
     </div>
   );
 }

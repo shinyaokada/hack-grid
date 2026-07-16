@@ -73,6 +73,6 @@ describe("applyRawInput", () => {
   it("ignores a blank submission", () => {
     const session = createSession(stage);
     const after = applyRawInput(session, "   ");
-    expect(after.state.log.length).toBe(0);
+    expect(after.state.log.length).toBe(session.state.log.length);
   });
 });

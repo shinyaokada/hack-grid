@@ -1,4 +1,5 @@
 import type { StageDefinition } from "@/data/stageSchema";
+import { COMMAND_HINTS } from "@/engine/hints";
 import type { Command, EngineState, LogEntry, Session } from "@/engine/types";
 import {
   handleCd,
@@ -26,6 +27,15 @@ export function createSession(stage: StageDefinition): Session {
     filesystem[dir] = [...entries];
   }
 
+  const log: LogEntry[] = [];
+  let nextLogId = 1;
+  const hintLines = stage.newCommands
+    .filter((name) => COMMAND_HINTS[name])
+    .map((name) => `NEW: ${name} — ${COMMAND_HINTS[name]}`);
+  if (hintLines.length > 0) {
+    log.push({ id: nextLogId++, commandText: "", lines: hintLines, isError: false, isSystem: true });
+  }
+
   return {
     stage,
     state: {
@@ -35,9 +45,9 @@ export function createSession(stage: StageDefinition): Session {
       files,
       filesystem,
       goalRevealed: false,
-      log: [],
+      log,
     },
-    nextLogId: 1,
+    nextLogId,
   };
 }
 
