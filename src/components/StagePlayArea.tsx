@@ -3,38 +3,45 @@
 import { useState } from "react";
 import { TerminalPane } from "@/components/TerminalPane";
 import type { StageDefinition } from "@/data/stageSchema";
-import { useGameSession } from "@/hooks/useGameSession";
 
 const MAX_PANES = 3;
 
 /**
- * All terminal panes for a stage share one game session (same host, same
- * filesystem) - running a command in one pane is visible from every pane,
- * like several terminal windows open onto the same machine.
+ * Each terminal pane is a fully independent session (its own copy of the
+ * filesystem, current directory, and log) - like opening separate terminal
+ * windows against separate machines, not multiple views of one session.
  */
 export function StagePlayArea({ stage }: { stage: StageDefinition }) {
-  const [session, dispatch] = useGameSession(stage);
-  const [paneCount, setPaneCount] = useState(1);
+  const [paneIds, setPaneIds] = useState<number[]>([0]);
+  const [nextId, setNextId] = useState(1);
+
+  function addPane() {
+    setPaneIds((prev) => (prev.length >= MAX_PANES ? prev : [...prev, nextId]));
+    setNextId((n) => n + 1);
+  }
+
+  function closePane(id: number) {
+    setPaneIds((prev) => (prev.length <= 1 ? prev : prev.filter((paneId) => paneId !== id)));
+  }
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex h-[80vh] gap-2 overflow-x-auto">
-        {Array.from({ length: paneCount }).map((_, i) => (
+        {paneIds.map((id, i) => (
           <TerminalPane
-            key={i}
-            label={paneCount > 1 ? `ターミナル ${i + 1}` : "ターミナル"}
-            session={session}
-            dispatch={dispatch}
-            onClose={i > 0 ? () => setPaneCount((n) => n - 1) : undefined}
+            key={id}
+            stage={stage}
+            label={paneIds.length > 1 ? `ターミナル ${i + 1}` : "ターミナル"}
+            onClose={paneIds.length > 1 ? () => closePane(id) : undefined}
           />
         ))}
       </div>
-      {paneCount < MAX_PANES && (
+      {paneIds.length < MAX_PANES && (
         <button
-          onClick={() => setPaneCount((n) => Math.min(MAX_PANES, n + 1))}
+          onClick={addPane}
           className="self-start rounded border border-green-800 px-2 py-1 text-xs text-green-500 hover:bg-green-950"
         >
-          + ターミナルを分割（同じセッションを共有します）
+          + ターミナルを分割（独立したセッションになります）
         </button>
       )}
     </div>

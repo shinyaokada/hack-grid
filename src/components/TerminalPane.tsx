@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Session } from "@/engine/types";
+import type { StageDefinition } from "@/data/stageSchema";
+import { useGameSession } from "@/hooks/useGameSession";
 
+/** Owns its own independent session - a separate terminal window onto its own copy of the machine. */
 export function TerminalPane({
+  stage,
   label,
-  session,
-  dispatch,
   onClose,
 }: {
+  stage: StageDefinition;
   label: string;
-  session: Session;
-  dispatch: (raw: string) => void;
   onClose?: () => void;
 }) {
+  const [session, dispatch] = useGameSession(stage);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
