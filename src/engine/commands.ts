@@ -65,12 +65,43 @@ export function handleRead(state: EngineState, target: string): CommandResult {
   return { lines: [`--- ${path} ---`, file.content], isError: false };
 }
 
-export function handleInspect(stage: StageDefinition, target: string): CommandResult {
+export function handleInspect(
+  state: EngineState,
+  stage: StageDefinition,
+  target: string,
+): CommandResult {
   const tool = stage.tools[target];
-  if (!tool) {
-    return { lines: ["拒否: そのようなツールはありません"], isError: true };
+  if (tool) {
+    return { lines: tool.inspectText.split("\n"), isError: false };
   }
-  return { lines: tool.inspectText.split("\n"), isError: false };
+
+  const path = normalizeDir(resolvePath(state.currentDir, target));
+
+  const file = state.files[path];
+  if (file) {
+    if (!file.exists) {
+      return { lines: ["拒否: ファイルが存在しません"], isError: true };
+    }
+    return {
+      lines: ["種別: ファイル", `所有者: ${file.owner}`, `読み取り可: ${file.readableBy.join(", ")}`],
+      isError: false,
+    };
+  }
+
+  const dirDef = stage.dirs?.[path];
+  const isKnownDir =
+    Boolean(dirDef) || Object.prototype.hasOwnProperty.call(state.filesystem, path);
+  if (isKnownDir) {
+    return {
+      lines: [
+        "種別: ディレクトリ",
+        `入室可: ${dirDef?.enterableBy ? dirDef.enterableBy.join(", ") : "制限なし"}`,
+      ],
+      isError: false,
+    };
+  }
+
+  return { lines: ["拒否: そのようなツール・ファイル・ディレクトリはありません"], isError: true };
 }
 
 export function handleStatus(state: EngineState): CommandResult {

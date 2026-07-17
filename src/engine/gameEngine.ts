@@ -84,7 +84,7 @@ export function applyCommand(session: Session, command: Command): Session {
       case "read":
         return handleRead(state, command.target);
       case "inspect":
-        return handleInspect(stage, command.target);
+        return handleInspect(state, stage, command.target);
       case "run":
         return handleRun(state, stage, command.tool, command.arg);
       case "status":
